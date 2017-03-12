@@ -17,8 +17,8 @@ public:
 	void add(const DataContainer<T_width>& dc);
 
 	//getters
-	DataContainer<T_width> getStandardDeviation(int index) const;
-	DataContainer<T_width> getMean(int index) const;
+	DataContainer<T_width> getStandardDeviation() const;
+	DataContainer<T_width> getMean() const;
 
 	template<size_t, size_t> 
 	friend std::ostream& operator<<(std::ostream os, const StatisticsBuffer<N, T_width>& sb) {
@@ -37,6 +37,7 @@ private:
 	bool isEmpty;
 
 	void popOldestElement();
+	double getMeanOfIndex(int) const;
 };
 
 //CLASS METHOD DEFINITIONS////////////////////////////////////////////////
@@ -75,6 +76,8 @@ void StatisticsBuffer<N, T_width>::add(const DataContainer<T_width>& dc) {
 	isEmpty = false;
 }
 
+//Helper functions/////////////////////////////////////////////////////////
+
 /*
 void PopOldestElement()
 Deallocates the oldest element in the buffer, and then updates 
@@ -88,27 +91,47 @@ void StatisticsBuffer<N, T_width>::popOldestElement() {
 	zeroIndex = (zeroIndex+1)%N;
 }
 
-//GETTERS//
+/*
+double getMeanOfIndex(int index)
+Returns the mean of all the values at a certain index in the DataContainers
+*/
 template<size_t N, size_t T_width>
-DataContainer<T_width> StatisticsBuffer<N, T_width>::getStandardDeviation(int index) const {
+double StatisticsBuffer<N, T_width>::getMeanOfIndex(int index) const {
+	double runningTotal=0; int size=0;
+	for (int i=0; i<N; i++) {
+		if (buffer[i]!=NULL) {
+			runningTotal+=(*buffer[i])[index];
+			size++;
+		}
+	}
+	return runningTotal/(double)size;
+}
+
+//GETTERS////////////////////////////////////////////////////////////////
+//stdev
+template<size_t N, size_t T_width>
+DataContainer<T_width> StatisticsBuffer<N, T_width>::getStandardDeviation() const {
 	DataContainer<T_width> out;
 	return out;
 }
 
+//mean
 template<size_t N, size_t T_width>
-DataContainer<T_width> StatisticsBuffer<N, T_width>::getMean(int index) const {
+DataContainer<T_width> StatisticsBuffer<N, T_width>::getMean() const {
 	DataContainer<T_width> out;
+	for (int i=0; i<T_width; i++) 
+		out[i] = getMeanOfIndex(i);
 	return out;
 }
 
-//printer functions
+//printer functions///////////////////////////////////////////////////////
 template<size_t N, size_t T_width>
 std::ostream& StatisticsBuffer<N, T_width>::printSB(std::ostream& os) const {
 	if (isEmpty) std::cout << "--buffer is empty--\n";
 	else {
-		std::cout << "From oldest to newest:\n" << *buffer[zeroIndex] << "  -- index " << zeroIndex << std::endl;;
+		std::cout << "From oldest to newest:\n" << *buffer[zeroIndex] << "  -- buffer index " << zeroIndex << std::endl;;
 		for (int i=(zeroIndex+1)%N; i!=currIndex; i=(i+1)%N) {
-			std::cout << *buffer[i] << "  -- index " << i << std::endl;
+			std::cout << *buffer[i] << "  -- buffer index " << i << std::endl;
 		}
 	}
 	return os;

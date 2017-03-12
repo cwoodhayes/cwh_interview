@@ -16,8 +16,9 @@ int main() {
 
 	for (int i=0; i<10; i++) {
 		DataRow drtemp;
-		drtemp.fill(i);
+		drtemp.fill(i*i);
 		sb.add(drtemp);
 		sb.printSB(cout);
+		cout << sb.getMean() << endl;
 	}
 }
