@@ -1,3 +1,6 @@
+#ifndef DATA_CONTAINER
+#define DATA_CONTAINER
+
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -68,4 +71,6 @@ public:
 		return os;
 	}
 };
+
+#endif
 
