@@ -76,7 +76,7 @@ public:
 		for (int i=0; i<T_width-1; i++) {
 			os << dc[i] << ", ";
 		}
-		os << dc[T_width-1] << "]\n";
+		os << dc[T_width-1] << "]";
 		return os;
 	}
 };

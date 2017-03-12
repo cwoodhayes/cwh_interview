@@ -17,13 +17,15 @@ public:
 	void add(const DataContainer<T_width>& dc);
 
 	//getters
-	double getStandardDeviationI(int index) const;
-	double getMeanI(int index) const;
+	DataContainer<T_width> getStandardDeviation(int index) const;
+	DataContainer<T_width> getMean(int index) const;
 
-	double getStandardDeviationAll() const;
-	double getMeanAll() const;
+	template<size_t, size_t> 
+	friend std::ostream& operator<<(std::ostream os, const StatisticsBuffer<N, T_width>& sb) {
+		return sb.printSB(os);
+	}
 
-	friend std::ostream& operator<<(std::ostream&, const StatisticsBuffer<N, T_width>&);
+	std::ostream& printSB(std::ostream& os) const;
 private:
 	DataContainer<T_width>* buffer[N];
 	//"zeroIndex" tracks the index of the oldest element in the buffer
@@ -35,7 +37,6 @@ private:
 	bool isEmpty;
 
 	void popOldestElement();
-	std::ostream& printSB(std::ostream& os) const;
 };
 
 //CLASS METHOD DEFINITIONS////////////////////////////////////////////////
@@ -69,7 +70,8 @@ template<size_t N, size_t T_width>
 void StatisticsBuffer<N, T_width>::add(const DataContainer<T_width>& dc) {
 	//if we need to overwrite the oldest element, pop it
 	if(!isEmpty && currIndex == zeroIndex) popOldestElement();
-	buffer[++currIndex] = new DataContainer<T_width>(dc);
+	buffer[currIndex] = new DataContainer<T_width>(dc);
+	currIndex = (currIndex+1)%N;
 	isEmpty = false;
 }
 
@@ -88,23 +90,15 @@ void StatisticsBuffer<N, T_width>::popOldestElement() {
 
 //GETTERS//
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getStandardDeviationI(int index) const {
-	return 5.0;
+DataContainer<T_width> StatisticsBuffer<N, T_width>::getStandardDeviation(int index) const {
+	DataContainer<T_width> out;
+	return out;
 }
 
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getMeanI(int index) const {
-	return 5.0;
-}
-
-template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getStandardDeviationAll() const {
-	return 5.0;
-}
-
-template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getMeanAll() const {
-	return 5.0;
+DataContainer<T_width> StatisticsBuffer<N, T_width>::getMean(int index) const {
+	DataContainer<T_width> out;
+	return out;
 }
 
 //printer functions
@@ -112,17 +106,12 @@ template<size_t N, size_t T_width>
 std::ostream& StatisticsBuffer<N, T_width>::printSB(std::ostream& os) const {
 	if (isEmpty) std::cout << "--buffer is empty--\n";
 	else {
-		std::cout << "From oldest to newest:\n" << buffer[zeroIndex];
-		for (int i=zeroIndex+1; i!=currIndex; i=(i+1)%N) {
-			std::cout << buffer[i];
+		std::cout << "From oldest to newest:\n" << *buffer[zeroIndex] << "  -- index " << zeroIndex << std::endl;;
+		for (int i=(zeroIndex+1)%N; i!=currIndex; i=(i+1)%N) {
+			std::cout << *buffer[i] << "  -- index " << i << std::endl;
 		}
 	}
 	return os;
-}
-
-template<size_t N, size_t T_width>
-std::ostream& operator<<(std::ostream& os, const StatisticsBuffer<N, T_width>& sb) {
-	return sb.printSB(os);
 }
 
 #endif
