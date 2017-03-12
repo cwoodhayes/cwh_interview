@@ -2,8 +2,8 @@
 #include "StatisticsBuffer.hpp"
 #include <iostream>
 
-#define DATAROW_LENGTH 4
-#define STAT_BUF_LENGTH 5
+#define DATAROW_LENGTH 6
+#define STAT_BUF_LENGTH 10
 typedef DataContainer< DATAROW_LENGTH > DataRow;
 typedef StatisticsBuffer< STAT_BUF_LENGTH, DATAROW_LENGTH > StatBuf;
 
@@ -14,11 +14,13 @@ int main() {
 	//using cout
 	StatBuf sb;
 
-	for (int i=0; i<10; i++) {
+	for (int i=0; i<20; i++) {
 		DataRow drtemp;
-		drtemp.fill(i*i);
+		for (int j=0; j<DATAROW_LENGTH; j++) 
+			drtemp[j] = i*i + j;
 		sb.add(drtemp);
 		sb.printSB(cout);
-		cout << sb.getMean() << endl;
+		cout << "Mean:  " << sb.getMean() << endl;
+		cout << "Stdev: " << sb.getStandardDeviation() << endl;
 	}
 }

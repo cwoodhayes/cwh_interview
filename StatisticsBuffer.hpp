@@ -112,6 +112,17 @@ double StatisticsBuffer<N, T_width>::getMeanOfIndex(int index) const {
 template<size_t N, size_t T_width>
 DataContainer<T_width> StatisticsBuffer<N, T_width>::getStandardDeviation() const {
 	DataContainer<T_width> out;
+	DataContainer<T_width> means = this->getMean();
+	DataContainer<T_width> runningVariance;
+
+	int size=0;
+	for (int i=0; i<N; i++) {
+		if (buffer[i]!=NULL) {
+			runningVariance+=((*buffer[i])-means).Pow(2);
+			size++;
+		}
+	}
+	out = (runningVariance/size).Sqrt();
 	return out;
 }
 
