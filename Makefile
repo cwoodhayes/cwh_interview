@@ -12,17 +12,17 @@ all: mkbin StatisticsBuffer DataContainer
 StatisticsBuffer: StatisticsBuffer.o DataContainer.o
 	$(CC) $(FLAGS) -o $(BIN)/StatisticsBuffer SBMain.cpp
 
-StatisticsBuffer.o: StatisticsBuffer.hpp
-	$(CC) $(OBJFLAGS) -o $(BIN)/StatisticsBuffer.o StatisticsBuffer.hpp
-
 DataContainer: DataContainer.o
 	$(CC) $(FLAGS) -o $(BIN)/DataContainer DCMain.cpp
 
-DataContainer.o: DataContainer.hpp
-	$(CC) $(OBJFLAGS) -o $(BIN)/DataContainer.o DataContainer.hpp
+%.o: %.hpp
+	$(CC) $(OBJFLAGS) -o $(BIN)/$@ $<
 
 mkbin:
 	mkdir -p $(BIN)
 
+clean:
+	rm -rf bin/*
+
 .phony:
-	all mkbin
+	all mkbin clean
