@@ -1,1 +1,2 @@
-bin/*		//ignore everything in the bin
+#ignore everything in the bin
+bin/*

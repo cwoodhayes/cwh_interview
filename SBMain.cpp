@@ -6,5 +6,6 @@
 typedef DataContainer< DATAROW_LENGTH > DataRow;
 
 int main() {
-
+	//conduct a visual check of the internal workings of the DataContainer
+	//using cout
 }

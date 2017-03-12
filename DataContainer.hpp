@@ -8,6 +8,15 @@
 template<size_t T_width>
 class DataContainer : public std::array<double, T_width> {
 public:
+	//default constructor
+	DataContainer() {};
+	//copy constructor. Sort of expensive, but that's unavoidable
+	DataContainer(const DataContainer& other) {
+		for (int i=0; i<T_width; i++) {
+			(*this)[i] = other[i];
+		}
+	}
+
 	DataContainer operator+(DataContainer<T_width> rhs) const {
 		DataContainer<T_width> out;
 		for (int i=0; i<T_width; i++) {
@@ -67,7 +76,7 @@ public:
 		for (int i=0; i<T_width-1; i++) {
 			os << dc[i] << ", ";
 		}
-		os << dc[T_width-1] << "]";
+		os << dc[T_width-1] << "]\n";
 		return os;
 	}
 };

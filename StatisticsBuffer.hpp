@@ -14,15 +14,16 @@ class StatisticsBuffer {
 public:
 	StatisticsBuffer();
 	~StatisticsBuffer();
-	void add(DataContainer<T_width>& dc);
+	void add(const DataContainer<T_width>& dc);
 
 	//getters
-	double getStandardDeviationI(int index);
-	double getMeanI(int index);
+	double getStandardDeviationI(int index) const;
+	double getMeanI(int index) const;
 
-	double getStandardDeviationAll();
-	double getMeanAll();
+	double getStandardDeviationAll() const;
+	double getMeanAll() const;
 
+	friend std::ostream& operator<<(std::ostream&, const StatisticsBuffer<N, T_width>&);
 private:
 	DataContainer<T_width>* buffer[N];
 	//"zeroIndex" tracks the index of the oldest element in the buffer
@@ -30,14 +31,14 @@ private:
 	
 	//"currIndex" tracks the index of the next open location in the buffer
 	int currIndex;
-	
-	//"size" tracks the number of elements currently in the buffer
-	int size;		
+
+	bool isEmpty;
 
 	void popOldestElement();
+	std::ostream& printSB(std::ostream& os) const;
 };
 
-//CLASS METHOD DEFINITIONS
+//CLASS METHOD DEFINITIONS////////////////////////////////////////////////
 
 /*default constructor*/
 template<size_t N, size_t T_width>
@@ -46,7 +47,8 @@ StatisticsBuffer<N,T_width>::StatisticsBuffer() {
 		buffer[i] = NULL;
 	}
 	zeroIndex = 0;
-	size = 0;
+	currIndex = 0;
+	isEmpty = true;
 }
 
 /*destructor*/
@@ -60,43 +62,67 @@ StatisticsBuffer<N, T_width>::~StatisticsBuffer() {
 /*
 void Add()
 Add a new element to the next open spot in the buffer.
+This buffer is implemented as a circular array to avoid unnecessary copying
+of the internal DataContainers upon adding, which would be expensive.
 */
 template<size_t N, size_t T_width>
-void StatisticsBuffer<N, T_width>::add(DataContainer<T_width>& dc) {
-	this->popOldestElement();
-	buffer[4];
+void StatisticsBuffer<N, T_width>::add(const DataContainer<T_width>& dc) {
+	//if we need to overwrite the oldest element, pop it
+	if(!isEmpty && currIndex == zeroIndex) popOldestElement();
+	buffer[++currIndex] = new DataContainer<T_width>(dc);
+	isEmpty = false;
 }
 
 /*
 void PopOldestElement()
 Deallocates the oldest element in the buffer, and then updates 
-zeroIndex and currIndex (and size, if necessary) to reflect the new location
+zeroIndex to reflect the new location
 of the buffer in the circular array.
 */
 template<size_t N, size_t T_width>
 void StatisticsBuffer<N, T_width>::popOldestElement() {
-	//pop it
+	delete buffer[zeroIndex];
+	buffer[zeroIndex] = NULL;
+	zeroIndex = (zeroIndex+1)%N;
 }
 
 //GETTERS//
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getStandardDeviationI(int index) {
+double StatisticsBuffer<N, T_width>::getStandardDeviationI(int index) const {
 	return 5.0;
 }
 
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getMeanI(int index) {
+double StatisticsBuffer<N, T_width>::getMeanI(int index) const {
 	return 5.0;
 }
 
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getStandardDeviationAll() {
+double StatisticsBuffer<N, T_width>::getStandardDeviationAll() const {
 	return 5.0;
 }
 
 template<size_t N, size_t T_width>
-double StatisticsBuffer<N, T_width>::getMeanAll() {
+double StatisticsBuffer<N, T_width>::getMeanAll() const {
 	return 5.0;
+}
+
+//printer functions
+template<size_t N, size_t T_width>
+std::ostream& StatisticsBuffer<N, T_width>::printSB(std::ostream& os) const {
+	if (isEmpty) std::cout << "--buffer is empty--\n";
+	else {
+		std::cout << "From oldest to newest:\n" << buffer[zeroIndex];
+		for (int i=zeroIndex+1; i!=currIndex; i=(i+1)%N) {
+			std::cout << buffer[i];
+		}
+	}
+	return os;
+}
+
+template<size_t N, size_t T_width>
+std::ostream& operator<<(std::ostream& os, const StatisticsBuffer<N, T_width>& sb) {
+	return sb.printSB(os);
 }
 
 #endif
